@@ -1,4 +1,4 @@
-import KetricsElement from "http://localhost:3000/components/KetricsElement.js";
+import KetricsElement from "../KetricsElement/KetricsElement.js";
 
 
 export default class GoogleTable extends KetricsElement {

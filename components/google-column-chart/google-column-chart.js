@@ -1,4 +1,4 @@
-import GoogleChart from "http://localhost:3000/components/GoogleChart.js";
+import GoogleChart from "../GoogleChart/GoogleChart.js";
 
 class GoogleColumnChart extends GoogleChart {
     chartType = "Column";
