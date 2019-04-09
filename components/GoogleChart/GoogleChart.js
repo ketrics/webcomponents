@@ -1,42 +1,49 @@
-import KetricsElement from "../KetricsElement/KetricsElement.js";
+import {LitElement, html} from "https://unpkg.com/lit-element?module";
 
 
-export default class GoogleChart extends KetricsElement {
-    static get defaultProps() {
+export default class GoogleChart extends LitElement{
+    static get properties() {
         return {
-            data: {type: 'object', required: true},
-            title: {type: 'text', required: true},
-            x_serie: {type: 'text', required: true},
-            y_serie: {type: 'text', required: true},
-            width: {type: 'number'},
-            height: {type: 'number'},
-        }
+            data: { type: Array },
+            type: { type: String },
+            title: { type: String },
+            xSerie: { type: String, attribute: 'x_serie' },
+            ySerie: { type: String, attribute: 'y_serie' },
+            width: { type: Number },
+            height: { type: Number }
+        };
+    }
+
+    constructor() {
+        super();
+        this.data = [];
+        this.title = "";
+        this.type = "ColumnChart";
+        this.xSerie = null;
+        this.ySerie = null;
+        this.width = null;
+        this.height = 300;
+    }
+
+    render(){
+        return html`<div id="chart_div"></div>`;
     }
 
     get _options(){
         if(this.options)    return this.options;
 
-        return {
-            'title': this.props.title,
-            'width': this.props.width ? this.props.width: 400,
-            'height': this.props.height ? this.props.height: 300
-        };
-    }
+        let options = {
+            'title': this.title,
+            'height': this.height
+        }
 
-    render(){
-        const template = document.createElement('template');
-        if(!this.validateProps()) return template;
+        if(this.width!==null) options.width = this.width;
 
-        template.innerHTML = `
-            <div id="chart_div"></div>
-        `;
-        super.render(template);
-        this.renderChart();
+        return options;
     }
 
     get dataSource(){
-        const {data, x_serie, y_serie} = this.props;
-        return data.map(row=>{return[row[x_serie], row[y_serie]]});
+        return this.data.map(row=>{return[row[this.xSerie], row[this.ySerie]]});
     }
 
     addRows(dataTable){
@@ -44,51 +51,42 @@ export default class GoogleChart extends KetricsElement {
     }
 
     addColumns(dataTable){
-        const {x_serie, y_serie} = this.props;
         if(this.columns){
             this.columns.forEach(col=>{
                 dataTable.addColumn(col.type, col.label);
             })
         }else {
-            dataTable.addColumn('string', x_serie);
-            dataTable.addColumn('number', y_serie);
+            dataTable.addColumn('string', this.xSerie);
+            dataTable.addColumn('number', this.ySerie);
         }
     }
 
-    renderChart(){
-        const {title} = this.props;
-        // Load the Visualization API and the corechart package.
+    updated(changedProperties){
         google.charts.load('current', {'packages':['corechart']});
-
-        // Set a callback to run when the Google Visualization API is loaded.
         google.charts.setOnLoadCallback(drawChart);
 
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
         let self = this;
-        function drawChart (){
-            // Create the data table.
+        function drawChart() {
             var dataTable = new google.visualization.DataTable();
             self.addColumns(dataTable);
             self.addRows(dataTable);
 
             var chart;
-            switch (self.chartType.toLowerCase()) {
-                case 'pie':
-                    chart = new google.visualization.PieChart(self.root.getElementById('chart_div'));
+            switch (self.type.toLowerCase()) {
+                case 'piechart':
+                    chart = new google.visualization.PieChart(self.shadowRoot.getElementById('chart_div'));
                     break;
-                case 'column':
-                    chart = new google.visualization.ColumnChart(self.root.getElementById('chart_div'));
+                case 'columnchart':
+                    chart = new google.visualization.ColumnChart(self.shadowRoot.getElementById('chart_div'));
                     break;
-                case 'area':
-                    chart = new google.visualization.AreaChart(self.root.getElementById('chart_div'));
+                case 'areachart':
+                    chart = new google.visualization.AreaChart(self.shadowRoot.getElementById('chart_div'));
                     break;
-                case 'combo':
-                    chart = new google.visualization.ComboChart(self.root.getElementById('chart_div'));
+                case 'combochart':
+                    chart = new google.visualization.ComboChart(self.shadowRoot.getElementById('chart_div'));
                     break;
                 default:
-                    chart = new google.visualization.ColumnChart(self.root.getElementById('chart_div'));
+                    chart = new google.visualization.ColumnChart(self.shadowRoot.getElementById('chart_div'));
                     break;
             }
 
@@ -97,3 +95,4 @@ export default class GoogleChart extends KetricsElement {
     }
 }
 
+window.customElements.define('google-chart', GoogleChart);
