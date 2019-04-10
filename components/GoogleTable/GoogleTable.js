@@ -1,13 +1,12 @@
-import KetricsElement from "../KetricsElement/KetricsElement.js";
+import {KetricsElement, html} from "../Ketrics";
 
 
 export default class GoogleTable extends KetricsElement {
-    static get defaultProps() {
+    static get properties() {
         return {
-            data: {type: 'object', required: true},
-            title: {type: 'text', required: true},
-            columns: {type: 'object', required: true},
-        }
+            data: { type: Array },
+            title: { type: String }
+        };
     }
 
     get _options(){
@@ -23,18 +22,12 @@ export default class GoogleTable extends KetricsElement {
     }
 
     render(){
-        const template = document.createElement('template');
-
-        if(!this.validateProps()) return template;
-
-        template.innerHTML = `
+        return html`
             <style >
             @import "https://www.gstatic.com/charts/46.2/css/table/table.css";
             </style>
             <div id="table_div"></div>
         `;
-        super.render(template);
-        this.renderTable();
     }
 
     addColumns(dataTable){
@@ -58,11 +51,9 @@ export default class GoogleTable extends KetricsElement {
         dataTable.addRows(rows);
     }
 
-    formatData(dataTable){
-    }
+    formatData(dataTable){ }
 
-    renderTable(){
-
+    updated(changedProperties){
         // Load the Visualization API and the table package.
         google.charts.load('current', {'packages':['table']});
 
@@ -74,7 +65,7 @@ export default class GoogleTable extends KetricsElement {
         // draws it.
         let self = this;
         function drawTable (){
-            var table = new google.visualization.Table(self.root.querySelector('#table_div'));
+            var table = new google.visualization.Table(self.shadowRoot.querySelector('#table_div'));
             var dataTable = new google.visualization.DataTable();
             self.addColumns(dataTable);
             self.addRows(dataTable);

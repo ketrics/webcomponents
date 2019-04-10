@@ -1,7 +1,7 @@
-import {LitElement, html} from "https://unpkg.com/lit-element?module";
+import {KetricsElement, html} from "../Ketrics";
 
 
-export default class GoogleChart extends LitElement{
+export default class GoogleChart extends KetricsElement{
     static get properties() {
         return {
             data: { type: Array },
@@ -94,5 +94,3 @@ export default class GoogleChart extends LitElement{
         }
     }
 }
-
-window.customElements.define('google-chart', GoogleChart);
