@@ -1,4 +1,4 @@
-import {KetricsElement, html} from "../Ketrics";
+import {KetricsElement, html} from "../Ketrics/KetricsElement.js";
 
 
 export default class GoogleChart extends KetricsElement{
